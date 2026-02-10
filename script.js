@@ -251,8 +251,9 @@ function initQuestion() {
         }, 1000);
     });
 
-    // The "No" button — dodges the cursor!
+    // The "No" button — flees from the cursor!
     let noCount = 0;
+    const fleeDistance = 120; // pixels — how close before it runs
     const noMessages = [
         "Are you sure? 🥺",
         "Really?? 😭",
@@ -262,22 +263,57 @@ function initQuestion() {
         "Pretty please? 🥹",
         "Not an option! 😤",
         "Nope, try Yes! 💗",
+        "I'm too fast! 😜",
+        "Just say Yes! 💘",
     ];
 
     function moveNoButton() {
-        const margin = 100;
-        const x = margin + Math.random() * (window.innerWidth - margin * 2 - 150);
-        const y = margin + Math.random() * (window.innerHeight - margin * 2 - 60);
+        const margin = 80;
+        const maxX = window.innerWidth - margin - 160;
+        const maxY = window.innerHeight - margin - 60;
+        const x = margin + Math.random() * (maxX - margin);
+        const y = margin + Math.random() * (maxY - margin);
         btnNo.style.position = 'fixed';
         btnNo.style.left = x + 'px';
         btnNo.style.top = y + 'px';
         btnNo.style.zIndex = '1000';
-        btnNo.style.transition = 'left 0.15s ease, top 0.15s ease';
+        btnNo.style.transition = 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1), top 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
         btnNo.textContent = noMessages[noCount % noMessages.length];
         noCount++;
     }
 
-    btnNo.addEventListener('mouseover', moveNoButton);
+    // Continuous proximity detection — runs away as cursor approaches
+    document.addEventListener('mousemove', (e) => {
+        const rect = btnNo.getBoundingClientRect();
+        if (rect.width === 0) return; // not visible yet
+
+        const btnCenterX = rect.left + rect.width / 2;
+        const btnCenterY = rect.top + rect.height / 2;
+        const dx = e.clientX - btnCenterX;
+        const dy = e.clientY - btnCenterY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < fleeDistance) {
+            // Flee in the opposite direction from cursor
+            const angle = Math.atan2(dy, dx);
+            const fleeX = btnCenterX - Math.cos(angle) * 250;
+            const fleeY = btnCenterY - Math.sin(angle) * 250;
+
+            // Clamp within viewport
+            const margin = 60;
+            const clampedX = Math.max(margin, Math.min(window.innerWidth - margin - rect.width, fleeX - rect.width / 2));
+            const clampedY = Math.max(margin, Math.min(window.innerHeight - margin - rect.height, fleeY - rect.height / 2));
+
+            btnNo.style.position = 'fixed';
+            btnNo.style.left = clampedX + 'px';
+            btnNo.style.top = clampedY + 'px';
+            btnNo.style.zIndex = '1000';
+            btnNo.style.transition = 'left 0.2s cubic-bezier(0.4, 0, 0.2, 1), top 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+            btnNo.textContent = noMessages[noCount % noMessages.length];
+            noCount++;
+        }
+    });
+
     btnNo.addEventListener('touchstart', (e) => {
         e.preventDefault();
         moveNoButton();
