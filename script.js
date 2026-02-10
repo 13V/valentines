@@ -235,6 +235,19 @@ function initStoryScroll() {
 function initQuestion() {
     const btnYes = document.getElementById('btnYes');
     const btnNo = document.getElementById('btnNo');
+    let questionActive = false;
+
+    // Watch for question screen becoming active
+    const observer = new MutationObserver(() => {
+        const questionScreen = document.getElementById('screen-question');
+        if (questionScreen.classList.contains('active')) {
+            // Give a 2s grace period so the button is visible before it can flee
+            setTimeout(() => { questionActive = true; }, 2000);
+        } else {
+            questionActive = false;
+        }
+    });
+    observer.observe(document.getElementById('screen-question'), { attributes: true, attributeFilter: ['class'] });
 
     btnYes.addEventListener('click', () => {
         // Immediate confetti burst
@@ -284,6 +297,8 @@ function initQuestion() {
 
     // Continuous proximity detection — runs away as cursor approaches
     document.addEventListener('mousemove', (e) => {
+        if (!questionActive) return; // Don't flee until screen is fully visible
+
         const rect = btnNo.getBoundingClientRect();
         if (rect.width === 0) return; // not visible yet
 
