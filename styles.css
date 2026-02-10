@@ -134,6 +134,7 @@ body {
     cursor: pointer;
     perspective: 1000px;
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
 }
 
 .envelope-container:hover {
@@ -164,36 +165,6 @@ body {
     z-index: 1;
 }
 
-.envelope-front {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 65%;
-    background: linear-gradient(170deg, #e8929f 0%, #d0707f 40%, #c4596a 100%);
-    clip-path: polygon(0 40%, 50% 0%, 100% 40%, 100% 100%, 0 100%);
-    border-radius: 0 0 12px 12px;
-    z-index: 3;
-}
-
-.envelope-flap {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 55%;
-    background: linear-gradient(180deg, #e09aa5 0%, #d0808e 100%);
-    clip-path: polygon(0 0, 50% 100%, 100% 0);
-    transform-origin: top center;
-    transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 4;
-    border-radius: 12px 12px 0 0;
-}
-
-.envelope-container.opened .envelope-flap {
-    transform: rotateX(180deg);
-}
-
 .envelope-letter {
     position: absolute;
     top: 15%;
@@ -207,11 +178,44 @@ body {
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
-    transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1) 0.5s;
+    transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1) 0.5s,
+        z-index 0s linear 0.5s;
 }
 
 .envelope-container.opened .envelope-letter {
     transform: translateY(-200px) scale(1.1);
+    z-index: 10;
+}
+
+.envelope-front {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65%;
+    background: linear-gradient(170deg, #e8929f 0%, #d0707f 40%, #c4596a 100%);
+    clip-path: polygon(0 35%, 50% 0%, 100% 35%, 100% 100%, 0 100%);
+    border-radius: 0 0 12px 12px;
+    z-index: 5;
+}
+
+.envelope-flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 55%;
+    background: linear-gradient(180deg, #e09aa5 0%, #d0808e 100%);
+    clip-path: polygon(0 0, 50% 100%, 100% 0);
+    transform-origin: top center;
+    transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 6;
+    border-radius: 12px 12px 0 0;
+    backface-visibility: hidden;
+}
+
+.envelope-container.opened .envelope-flap {
+    transform: rotateX(180deg);
 }
 
 .letter-content {
